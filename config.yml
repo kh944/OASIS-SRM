@@ -1,0 +1,70 @@
+# === MQTT Configuration ===
+mqtt:
+  enabled: true                   # Enable MQTT for Frigate
+  host: localhost                 # MQTT broker address
+  port: 1883                      # MQTT broker port
+  topic_prefix: frigate           # MQTT topic prefix for Frigate
+  user: <MQTT_USERNAME>           # MQTT username (if authentication is used)
+  password: <MQTT_PASSWORD>       # MQTT password (if authentication is used)
+
+# === Object Detection Using Google Coral TPU ===
+detectors:
+  coral:
+    type: edgetpu
+    device: usb                   # USB-attached Coral TPU
+
+# === FFmpeg Hardware Acceleration (Optimized for Raspberry Pi 64-bit) ===
+ffmpeg:
+  hwaccel_args: preset-rpi-64-h264
+
+# === Recording Configuration ===
+record:
+  enabled: true
+  retain:
+    days: 7                       # Retain recordings for 7 days
+    mode: motion                  # Only record when motion is detected
+  alerts:
+    retain:
+      days: 7
+    pre_capture: 5                # Record 5 seconds before alert
+    post_capture: 5               # Record 5 seconds after alert
+  detections:
+    retain:
+      days: 7
+    pre_capture: 5                # Record 5 seconds before detection
+    post_capture: 5               # Record 5 seconds after detection
+
+# === Snapshot Configuration ===
+snapshots:
+  enabled: true
+  retain:
+    default: 7                    # Retain snapshots for 7 days
+
+# === Camera Configuration ===
+cameras:
+  pi_camera:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:9554/pi_camera_h264  # RTSP stream from go2rtc
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+            - record
+            - rtmp
+    detect:
+      enabled: true
+      width: 1280                 # Detection resolution width
+      height: 720                 # Detection resolution height
+      fps: 5                      # Frame rate for detection
+    objects:
+      track:
+        - person
+        - car
+        - cat
+        - dog
+    motion:
+      mask:
+        - 0,0,0,0,0,0             # Placeholder mask (no mask applied)
+
+# === Configuration Version ===
+version: 0.15-1
